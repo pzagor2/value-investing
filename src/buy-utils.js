@@ -1,7 +1,4 @@
-
-
-
-
+'use strict';
 
 //price and amountToSpend are string
 function calculateSizeToBuy(price, amountToSpend) {

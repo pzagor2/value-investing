@@ -1,3 +1,4 @@
+'use strict';
 const express = require('express');
 const Agenda = require('agenda');
 const Agendash = require('agendash');
@@ -28,6 +29,7 @@ agenda.define(config.agendaJobName, (job, done) => {
         // console.log(`Last price set to ${lastPrice}`);
         // console.log(`trigger buy`);
         const lastPrice = price.getPrice(item.pair);
+        let promise;
 
         if (lastPrice) {
             const finalPrice = buyUtils.getFinalPrice(lastPrice);
@@ -40,13 +42,8 @@ agenda.define(config.agendaJobName, (job, done) => {
                 cancel_after: 'hour'
             };
 
-            let promise;
-
             if (item.gdax) {
-                promise =  gdaxBuy.buy({
-                    gdax: item.gdax,
-                    buyParams: buyParams
-                });
+                promise =  gdaxBuy.buy(item.gdax, buyParams);
             } else {
                 done();
             }

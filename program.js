@@ -30,55 +30,64 @@ agenda.on('ready', () => {
 });
 
 
-config.agendaJobName.map(jobName => {
-    agenda.define(jobName, (job, done) => {
-        // console.log(job);
-        Job.find({ name: job.attrs.name }).exec().then(data => {
-            console.log(`New job process ${JSON.stringify(data)}`);
-            let promisees = [];
-            data.map(modelItem => {
-                const item = modelItem._doc;
-                // console.log(`Last price set to ${lastPrice}`);
-                // console.log(`trigger buy`);
-                const lastPrice = price.getPrice(item.pair);
-                let promise;
-        
-                if (lastPrice) {
-                    const finalPrice = buyUtils.getFinalPrice(lastPrice);
-                    const buyParams = {
-                        price: finalPrice,
-                        size: buyUtils.calculateSizeToBuy(finalPrice, item.amount),
-                        product_id: item.pair,
-                        type: 'limit',
-                        // post_only: true,
-                        cancel_after: 'hour'
-                    };
-        
-                    if (item.gdax) {
-                        promise =  gdaxBuy.buy(item.gdax, buyParams);
-                    } else {
-                        promise = Promise.reject('No GDAX object present in user object');
-                    }
 
-                    promisees.push(promise);
-        
-                    promise.then((success) => {
-                        console.log(`Buy Success ${JSON.stringify(success)}`);
-                    }).catch(error => {
-                        console.log(`Buy Error ${JSON.stringify(error)}`);
-                    });
-                }
-            });
+function handleJob(modelItem) {
+    const item = modelItem._doc;
+    // console.log(`Last price set to ${lastPrice}`);
+    // console.log(`trigger buy`);
+    const lastPrice = price.getPrice(item.pair);
+    let promise;
 
-            Promise.all(promisees).then(values => {
-                // console.log(values);
-                console.log('We are done calling done()');
-                done();
-            });
+    if (lastPrice) {
+        const finalPrice = buyUtils.getFinalPrice(lastPrice);
+        const buyParams = {
+            price: finalPrice,
+            size: buyUtils.calculateSizeToBuy(finalPrice, item.amount),
+            product_id: item.pair,
+            type: 'limit',
+            // post_only: true,
+            cancel_after: 'hour'
+        };
+
+        if (item.gdax) {
+            promise =  gdaxBuy.buy(item.gdax, buyParams);
+        } else {
+            promise = Promise.reject('No GDAX object present in user object');
+        }
+
+        promise.then((success) => {
+            console.log(`Buy Success ${JSON.stringify(success)}`);
+        }).catch(error => {
+            console.log(`Buy Error ${JSON.stringify(error)}`);
+        });
+    }
+
+    return promise;
+}
+function handleAgendaJob(job, done) {
+    Job.find({ name: job.attrs.name }).exec().then(data => {
+        console.log(`New job process ${JSON.stringify(data)}`);
+        let promisees = [];
+
+        data.map(modelItem => {
+            promisees.push(handleJob(modelItem));
         });
 
-        
+        Promise.all(promisees).then(values => {
+            console.log('We are done calling done()');
+            done();
+        });
+    }); 
+}
+
+var listenToAgendaJobs = function(jobName) {
+    agenda.define(jobName, (job, done) => {
+        return handleAgendaJob(job, done);
     });
+}
+
+config.agendaJobName.map((jobName) => { 
+    return listenToAgendaJobs(jobName) 
 });
 
 

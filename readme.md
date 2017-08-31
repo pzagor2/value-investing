@@ -12,19 +12,26 @@ const Config = {
 ```
 #Example Agenda job data:
 ```
-{
-"jobs":[
-    {
-        "pair":"BTC-EUR",
-        "amount":"5",
-        "user":"",
-        "gdax":{
-            "secret":"",
-            "key":"",
-            "passphrase":"",
-            "URI":"https://api-public.sandbox.gdax.com"
-        }
+var job = new Job({
+    name: 'trigger buy 5 min',
+    pair: 'BTC-EUR', 
+    amount: '10',
+    gdax: {
+        secret: ``,
+        key: ``,
+        passphrase: ``,
+        URI: ``
     }
-]
-}
+  });
+
+job.save(function(err) {
+    if (err) throw err;
+    console.log('User saved successfully!');
+});
 ```
+
+#You can set these ENV variables
+process.env.PORT
+process.env.TRAIDING_PAIRS.split(' ')
+process.env.JOB_NAMES.split(' ')
+process.env.DB

@@ -81,14 +81,10 @@ function handleAgendaJob(job, done) {
 }
 
 var listenToAgendaJobs = function(jobName) {
-    agenda.define(jobName, (job, done) => {
-        return handleAgendaJob(job, done);
-    });
+    agenda.define(handleAgendaJob);
 }
 
-config.agendaJobName.map((jobName) => { 
-    return listenToAgendaJobs(jobName) 
-});
+config.agendaJobName.map(listenToAgendaJobs);
 
 
 

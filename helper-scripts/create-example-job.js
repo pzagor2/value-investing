@@ -1,6 +1,6 @@
-const config = require('./config/config');
+const config = require('../config/config');
 const Mongoose = require('mongoose');
-const Job = require('./src/models/job');
+const Job = require('../src/models/job');
 
 //Mongoose connection
 var mongoose = Mongoose.connect(config.mongoDBPath, { useMongoClient: true })

@@ -8,8 +8,12 @@ const price = require('./src/price');
 const buyUtils = require('./src/buy-utils');
 const gdaxBuy = require('./src/gdax-buy');
 const Mongoose = require('mongoose');
+const mongo_express = require('mongo-express/lib/middleware');
+const mongo_express_config = require('./config/mongo_express_config.js');
 //Models
 const Job = require('./src/models/job');
+
+
 
 //Mongoose connection
 var mongoose = Mongoose.connect(config.mongoDBPath, { useMongoClient: true })
@@ -19,6 +23,7 @@ var mongoose = Mongoose.connect(config.mongoDBPath, { useMongoClient: true })
 })
 .catch(err => console.log(`Database connection error: ${err.message}`));
 mongoose.Promise = global.Promise;
+
 
 
 
@@ -87,8 +92,11 @@ var listenToAgendaJobs = function(jobName) {
 config.agendaJobName.map(listenToAgendaJobs);
 
 
-
-app.use('/', Agendash(agenda));
+app.use('/admin', mongo_express(mongo_express_config));
+app.use('/agenda', Agendash(agenda));
+app.get('/',(req, res) => {
+    res.send('OK');
+});
 app.listen(config.port, () => {
     console.log(`Listening on port ${config.port}!`);
 });

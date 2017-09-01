@@ -12,7 +12,7 @@ var mongoose = Mongoose.connect(config.mongoDBPath, { useMongoClient: true })
 mongoose.Promise = global.Promise;
 
 var job = new Job({
-    name: 'trigger buy every 2 hours',
+    name: '5 minutes',
     pair: 'BTC-EUR', 
     amount: '1',
     gdax: {

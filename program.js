@@ -89,7 +89,7 @@ var listenToAgendaJobs = function(jobName) {
     agenda.define(handleAgendaJob);
 }
 
-config.agendaJobName.map(listenToAgendaJobs);
+config.agendaJobNames.map(listenToAgendaJobs);
 
 
 app.use('/admin', mongo_express(mongo_express_config));

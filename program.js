@@ -81,12 +81,15 @@ function handleAgendaJob(job, done) {
         Promise.all(promisees).then(values => {
             console.log('We are done calling done()');
             done();
+        }).catch(errors => {
+            console.log(errors);
+            done();
         });
     }); 
 }
 
 var listenToAgendaJobs = function(jobName) {
-    agenda.define(handleAgendaJob);
+    agenda.define(jobName, handleAgendaJob);
 }
 
 config.agendaJobNames.map(listenToAgendaJobs);
